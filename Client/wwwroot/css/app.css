@@ -101,5 +101,8 @@ a, .btn-link {
     }
 
 .page-background-class {
-    background-image: url("../yunqueBlur.png")
+    background-image: url("../yunqueBlur.png");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
 }

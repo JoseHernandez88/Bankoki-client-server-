@@ -1,7 +1,196 @@
 ﻿@layout LoginLayout 
+@inject NavigationManager NavigationManager
 @page "/Registration"
 
 <PageTitle>Regristro</PageTitle>
 
-<h1>Pagina para registrar nuevo usuario</h1>
+<style>
+    body {
+        background-image: url("../Assets/yunqueBlur.png");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }
 
+    .box {
+        width: 60%;
+        height: 80%;
+    }
+
+    .registreBox {
+        background-color: #cbd3d4;
+        border-radius: 7%;
+        position: absolute;
+    }
+
+    .loginboxPos {
+        margin-left: 20%;
+        margin-top: 4%;
+    }
+
+    h1 {
+        color: #949259;
+        text-align: center;
+        margin-bottom: 10%;
+    }
+
+    .TextBox {
+        width: 80%;
+        height: 100%;
+        background-color: transparent;
+        border-width: 0;
+        border-bottom-width: thin;
+        font-size: 20px;
+        font-family: "Times New Roman", Times, serif;
+    }
+
+    .textBoxPos {
+        margin-left: 29%;
+        margin-top: 0%;
+        margin-bottom: 10%;
+    }
+
+    .text {
+        text-align: center;
+        margin-bottom: 5%;
+    }
+
+    .button {
+        border: none;
+        color: #949259;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        /* margin: 4px 2px; */
+        cursor: pointer;
+        background-color: white;
+        border-radius: 10%;
+        font-family: "Times New Roman", Times, serif;
+    }
+
+    .registrationButton {
+        border: none;
+        color: grey;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        /* margin: 4px 2px; */
+        cursor: pointer;
+        background-color: transparent;
+        border-radius: 10%;
+        font-family: "Times New Roman", Times, serif;
+    }
+
+    .parent {
+        display: grid;
+        grid-gap: 20px;
+        justify-content: center;
+        grid-template-columns: repeat(2, calc(33.33% - 20px));
+    }
+
+    .child {
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+</style>
+
+<body>
+    <div class="loginboxPos">
+             <div class="box registreBox">
+                 <h1>Registro</h1>
+
+                 <form action="/url" method="GET" class="parent text">
+                    <div class="textBoxPos child">
+                    <input @bind="nombre" type="text" placeholder="Nombre" class="TextBox" name="Nombre" />
+                    </div>
+
+                    <div class="textBoxPos child">
+                    <input @bind="apellidos" type="text" placeholder="Apellido" class="TextBox" name="Apellido" />
+                    </div>
+
+                    <div class="textBoxPos child">
+                    <input @bind="tel" type="number" placeholder="Numero de Telefono" class="TextBox" name="Telefono" />
+                    </div>
+
+                    <div class="textBoxPos child">
+                    <input @bind="dir1" type="text" placeholder="Direccion 1" class="TextBox" name="Dir1" />
+                    </div>
+
+                    <div class="textBoxPos child">
+                    <input @bind="dir2" type="text" placeholder="Direccion 2" class="TextBox" name="Dir2" />
+                    </div>
+
+                    <div class="textBoxPos child">
+                    <input @bind="email" type="text" placeholder="Email" class="TextBox" name="Email" />
+                    </div>
+
+                    <div class="textBoxPos child">
+                    <input @bind="contrasena" type="text" placeholder="Contrasena" class="TextBox" name="Contrasena" />
+                    </div>
+
+                    <div class="textBoxPos child">
+                    <input @bind="contrasenaConf" type="text" placeholder="Confirmar Contrasena" class="TextBox" name="ConfirmarPas" />
+                    </div>
+                 </form>
+
+                <div class="text">
+                    <button @onclick="RegisterValidation" class="button" href="MainPage">Login</button>
+                    <p>@notice</p>
+                </div>
+
+                 </div>
+             </div>
+</body>
+
+@code {
+    private string nombre { get; set; }
+    private string apellidos { get; set; }
+    private string tel { get; set; }
+    private string dir1 { get; set; }
+    private string dir2 { get; set; }
+    private string email { get; set; }
+    private string contrasena { get; set; }
+    private string contrasenaConf { get; set; }
+
+    private string notice = "";
+    private bool reg = true;
+
+    private void RegisterValidation()
+    {
+        //if (email == "hola@gmail.com" && contrasena == "1234")
+        //{
+        //    NavigationManager.NavigateTo("/MainPage");
+        //}
+        if (nombre == null || apellidos == null ||tel == null ||dir1 == null ||dir2 == null ||email == null ||contrasena == null ||contrasenaConf == null)
+        {
+            notice = "Porfavor llene todas las casillas";
+            reg = false;
+        }
+
+        if(contrasena != contrasenaConf)
+        {
+            notice = "Ocurrio un error con su contraseña";
+            reg = false;
+        }
+
+        if (email.Contains("@"))
+        {
+            
+        }
+        else
+        {
+            notice = "Porfavor ingrese correo electronico valido";
+            reg = false;
+        }
+
+        if(reg == true)
+        {
+            NavigationManager.NavigateTo("/MainPage");
+        }
+
+    }
+}
