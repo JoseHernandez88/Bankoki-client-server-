@@ -161,35 +161,25 @@
 
     private void RegisterValidation()
     {
-        //if (email == "hola@gmail.com" && contrasena == "1234")
-        //{
-        //    NavigationManager.NavigateTo("/MainPage");
-        //}
-        if (nombre == null || apellidos == null ||tel == null ||dir1 == null ||dir2 == null ||email == null ||contrasena == null ||contrasenaConf == null)
+   
+        if (nombre != null && apellidos != null && tel != null && dir1 != null && dir2 != null && email != null && email.Contains("@") && email.Contains(".com") && contrasena != null && contrasenaConf != null && contrasena == contrasenaConf)
         {
-            notice = "Porfavor llene todas las casillas";
-            reg = false;
-        }
-
-        if(contrasena != contrasenaConf)
-        {
-            notice = "Ocurrio un error con su contraseña";
-            reg = false;
-        }
-
-        if (email.Contains("@"))
-        {
-            
+            NavigationManager.NavigateTo("/MainPage");
         }
         else
         {
-            notice = "Porfavor ingrese correo electronico valido";
-            reg = false;
-        }
-
-        if(reg == true)
-        {
-            NavigationManager.NavigateTo("/MainPage");
+            if(contrasena != contrasenaConf)
+            {
+                notice = "Ocurrio un error con su contraseña";
+            }
+            else if (email == null || !email.Contains("@") || !email.Contains(".com"))
+            {
+                notice = "Porfavor ingrese email valido";
+            }
+            else
+            {
+                notice = "Recuerde rellenar todas las casillas";
+            }
         }
 
     }
