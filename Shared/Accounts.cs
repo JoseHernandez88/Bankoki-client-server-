@@ -1,4 +1,5 @@
 ﻿using Bankoki_client_server.Shared;
+using Google.Protobuf.WellKnownTypes;
 using System.Net.Http.Headers;
 
 namespace Bankoki_client_server_.Shared
@@ -58,20 +59,28 @@ namespace Bankoki_client_server_.Shared
         }
         public void addTransaction(Transaction? transaction)
         {
-            try
+            
+            Int64 intTransactionID;
+            QueryHandler qh= new QueryHandler();
+            long? transactionID= qh.insertTransaction(transaction,this.AccountNumber).Result;
+            if (transactionID != null)
             {
-                
-                QueryHandler qh= new QueryHandler();
-                int transactionID=qh.insertTransaction(transaction);
-                transaction = qh.getTransaction(transactionID);
+                intTransactionID = transactionID.Value;
+            }
+            else
+            {
+                throw new AccountException("Transaction failed to insert.");
+            }
+            transaction = qh.getTransaction((int)intTransactionID).Result;
+            if (transaction != null)
+            {
                 this.History.Append<Transaction?>(transaction);
             }
-            catch
+            else
             {
-
+                throw new AccountException("Failed to get Transaction from Database.");
             }
-            
-            
+             
         }
     }
 
