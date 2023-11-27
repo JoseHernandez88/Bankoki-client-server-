@@ -26,6 +26,7 @@ namespace Bankoki_client_server.Shared
             }
 
         }
+
         public MySqlConnectionStringBuilder conBuild= new MySqlConnectionStringBuilder
         {
             Server = "bankoki.mysql.database.azure.com",
@@ -35,7 +36,7 @@ namespace Bankoki_client_server.Shared
             SslMode = MySqlSslMode.Required,
         };
 
-        public async Task<long?> insertTransaction(Bankoki_client_server_.Shared.Transaction? transaction,string accountNumber)
+        public async Task<long?> insertTransactionAsync(Bankoki_client_server_.Shared.Transaction? transaction,string accountNumber)
         {
             try
             {
@@ -87,9 +88,10 @@ namespace Bankoki_client_server.Shared
             
         }
         
-        public async Task<Bankoki_client_server_.Shared.Transaction?> getTransaction(int transactionID)
+        public async Task<Bankoki_client_server_.Shared.Transaction?> getTransactionAsync(int transactionID)
         {
-        using (var connection = new MySqlConnection(conBuild.ConnectionString))
+            try { 
+            using (var connection = new MySqlConnection(conBuild.ConnectionString))
         {
             
             await connection.OpenAsync();
@@ -122,6 +124,101 @@ namespace Bankoki_client_server.Shared
                 }
            
         }
+            }catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+        
+
     }
+
+        public async Task<Accounts?> getAccountsAsync(string AccountsNumber)
+        {
+            try
+            {
+                using (var connection = new MySqlConnection(conBuild.ConnectionString))
+                {
+
+                    await connection.OpenAsync();
+                    try
+                    {
+                        Accounts account = new();
+                        using (var command = connection.CreateCommand())
+                        {
+                            command.CommandText = @"SELECT * FROM `account` with accountNumber=@number;";
+                            command.Parameters.AddWithValue("@number", AccountsNumber);
+                            
+                            
+                        using (MySqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.CloseConnection))
+                            {
+
+                                while (await reader.ReadAsync())
+                                {
+                                    account.AccountNumber = AccountsNumber;
+                                    account.OpenDate= DateOnly.FromDateTime(reader.GetDateTime("openDate"));
+                                    account.AccountName = reader.GetString("accountName");
+                                    account.Open = reader.GetBoolean("openStatus");
+                                    if (!account.Open)
+                                    {
+                                        account.CloseDate = DateOnly.FromDateTime(reader.GetDateTime("closeDATE"));
+                                    }
+                                }
+                            }
+                        }
+                        using (var command = connection.CreateCommand())
+                        { 
+                            command.CommandText = @"SELECT * FROM  `account_transaction` with `account`=@number;";
+                            command.Parameters.AddWithValue("@number", AccountsNumber);
+                           
+
+                            using (MySqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.CloseConnection))
+                            {
+
+                                while (await reader.ReadAsync())
+                                {
+                                    account.appendTransaction2History(reader.GetInt32("`transactions`"));
+                                }
+                            }
+                        }
+                        return account;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                        return null;
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+        }
+
+        public async void closeAccount(string accountNumber)
+        {
+            try
+            {
+                using (var connection = new MySqlConnection(conBuild.ConnectionString))
+                {
+                    using (var command = connection.CreateCommand())
+                    {
+                        await command.ExecuteNonQueryAsync();
+                        command.CommandText = "UPDATE `account` SET `closeDATE` = CAST( GETDATE() AS Date );" +
+                            "UPDATE `account` SET `openStatus` = 0";
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
     }
+
 }

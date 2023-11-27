@@ -1,6 +1,7 @@
 ﻿using Bankoki_client_server.Shared;
 using Google.Protobuf.WellKnownTypes;
 using System.Net.Http.Headers;
+using System.Transactions;
 
 namespace Bankoki_client_server_.Shared
 {
@@ -8,14 +9,14 @@ namespace Bankoki_client_server_.Shared
     {
         public string AccountNumber { get; set; }
          = string.Empty;
-        public string Name { get; set; }
+        public string AccountName { get; set; }
          = string.Empty;
         public bool Open { get; set; }
         public DateOnly OpenDate { get; set; }
         public DateOnly? CloseDate { get; set; } = null;
-        public required List<Transaction> History { get; set; }
-        public class AccountException : Exception
+        public List<Transaction> History { get; set; } = new List<Transaction>();
 
+        public class AccountException : Exception
         {
 
             public AccountException(string message)
@@ -27,62 +28,87 @@ namespace Bankoki_client_server_.Shared
             }
 
         }
+        public Accounts() { }
+
+        public Accounts(string AccountNumber)
+        {
+            this.AccountNumber = AccountNumber;
+            QueryHandler qh = new QueryHandler();
+            try
+            {
+                Accounts? temp= qh.getAccountsAsync(this.AccountNumber).Result;
+                if (temp != null)
+                {
+                    this.History = temp.History;
+                    this.OpenDate = temp.OpenDate;
+                    this.CloseDate = temp.CloseDate;
+                    this.AccountName = temp.AccountName;
+                    this.Open = temp.Open;
+                }
+                else
+                {
+                    throw new AccountException("The account number was not found in the database.");
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+
+        }
         public double balance()
         {
             int balance = 0;
-            foreach( Transaction transaction in History)
+            foreach (Transaction transaction in History)
             {
                 balance = transaction.sum(balance);
             }
-            return balance/100.0;
+            return balance / 100.0;
 
         }
         public void cancelAccount()
         {
             if (this.Open)
             {
-                if( this.balance() == 0.0)
+                if (this.balance() == 0.0)
                 {
                     this.CloseDate = DateOnly.FromDateTime(DateTime.Now);
                     this.Open = false;
+                    QueryHandler qh = new QueryHandler();
+                    qh.closeAccount(this.AccountNumber);
                 }
                 else
                 {
-                    throw new AccountException( "Tried to close a closed account.");
+                    throw new AccountException("Tried to close an account with balance.");
                 }
 
             }
             else
             {
-                throw new AccountException("Tried to close an account with balance.");
+                throw new AccountException("Tried to close a closed account.");
             }
         }
         public void addTransaction(Transaction? transaction)
         {
-            
-            Int64 intTransactionID;
-            QueryHandler qh= new QueryHandler();
-            long? transactionID= qh.insertTransaction(transaction,this.AccountNumber).Result;
+
+            QueryHandler qh = new QueryHandler();
+            long? transactionID = qh.insertTransactionAsync(transaction, this.AccountNumber).Result;
             if (transactionID != null)
             {
-                intTransactionID = transactionID.Value;
+                this.appendTransaction2History((int)transactionID.Value);
             }
             else
             {
                 throw new AccountException("Transaction failed to insert.");
             }
-            transaction = qh.getTransaction((int)intTransactionID).Result;
-            if (transaction != null)
-            {
-                this.History.Append<Transaction?>(transaction);
-            }
-            else
-            {
-                throw new AccountException("Failed to get Transaction from Database.");
-            }
-             
+            
+
+        }
+        public void appendTransaction2History(int transactionID)
+        {
+            this.History.Append<Transaction>(new Transaction(transactionID));
         }
     }
-
 }
     
