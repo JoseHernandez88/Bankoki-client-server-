@@ -1,14 +1,144 @@
 ﻿@layout LoginLayout
+@inject NavigationManager NavigationManager
 @page "/"
+
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello word!</h1>
+<style>
+    body {
+        background-image: url("../Assets/yunqueBlur.png");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }
 
-<NavLink class="nav-link" href="MainPage">
-    <span class="oi oi-plus" aria-hidden="true"></span> Login
-</NavLink>
+    .titleImg {
+        border-radius: 10%;
+    }
 
-<NavLink class="nav-link" href="Registration">
-    <span class="oi oi-plus" aria-hidden="true"></span> Register
-</NavLink>
+    .titleImgPos {
+        margin-left: 1%;
+        margin-top: 1%;
+    }
+
+    .box {
+        width: 30%;
+        height: 60%;
+    }
+
+    .loginBox {
+        background-color: #cbd3d4;
+        border-radius: 7%;
+        position: absolute;
+    }
+
+    .loginboxPos {
+        margin-left: 35%;
+        margin-top: 5%;
+    }
+
+    h1 {
+        color: #949259;
+        text-align: center;
+        margin-bottom: 10%;
+    }
+
+    .TextBox {
+        width: 57%;
+        height: 5%;
+        background-color: transparent;
+        border-width: 0;
+        border-bottom-width: thin;
+        font-size: 20px;
+        font-family: "Times New Roman", Times, serif;
+    }
+    .textBoxTitle {
+        font-family: "Times New Roman", Times, serif;
+    }
+
+    .textBoxPos {
+        margin-left: 29%;
+        margin-top: 0%;
+        margin-bottom: 10%;
+    }
+
+    .text {
+        text-align: center;
+        margin-bottom: 10%;
+    }
+
+    .button {
+        border: none;
+        color: #949259;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        /* margin: 4px 2px; */
+        cursor: pointer;
+        background-color: white;
+        border-radius: 10%;
+        font-family: "Times New Roman", Times, serif;
+    }
+
+    .registrationButton {
+        border: none;
+        color: grey;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        /* margin: 4px 2px; */
+        cursor: pointer;
+        background-color: transparent;
+        border-radius: 10%;
+        font-family: "Times New Roman", Times, serif;
+    }
+
+    .registrationButtonPos {
+        text-align: center;
+        margin-top: 10%;
+    }
+</style>
+
+<div class="loginboxPos">
+    <div class="box loginBox">
+        <h1 class="textBoxTitle">Iniciar Secion</h1>
+
+        <form action="/url" method="GET">
+            <div class="textBoxPos">
+                <input @bind="email" type ="text" placeholder="email" class="TextBox" name="Email" />
+            </div>
+
+            <div class="textBoxPos">
+                <input @bind="contrasena" type="text" placeholder="contrasena" class="TextBox" name="contrasena" />
+            </div>
+        </form>
+
+        <div class="text">
+            <button @onclick="LoginValidation" class="button" href="MainPage">Login</button>
+        </div>
+
+        <div class="text">
+            <NavLink class="registrationButton" href="Registration">
+                Aun no eres un miembro? <span style="color: #949259">Crea una cuenta</span>
+            </NavLink>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string contrasena { get; set; }
+    private string email { get; set; }
+
+    private void LoginValidation()
+    {
+        if (email == "hola@gmail.com" && contrasena == "1234")
+        {
+            NavigationManager.NavigateTo("/MainPage");
+        }
+    }
+}
