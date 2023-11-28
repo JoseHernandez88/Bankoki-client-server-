@@ -8,10 +8,18 @@ namespace Bankoki_client_server_.Shared
         public int TransactionID { get; set; }
         public string Origin { get; set; }
         =string.Empty;
-        public int Ammount {  get; set; }
+        public int Amount {  get; set; }
         public bool Credit { get; set; }
         public DateOnly TransactionDate { get; set; }
         public Transaction() { }
+
+        public Transaction( string origin, int amount, bool credit)
+        {
+            Origin = origin;
+            Amount = amount;
+            Credit = credit;
+            TransactionDate = DateOnly.FromDateTime(DateTime.Now);
+         }
         
         public Transaction(int TransactionID)
         {
@@ -23,7 +31,7 @@ namespace Bankoki_client_server_.Shared
                 if (temp != null)
                 {
                     this.Origin = temp.Origin;
-                    this.Ammount = temp.Ammount;
+                    this.Amount = temp.Amount;
                     this.Credit = temp.Credit;
                     this.TransactionDate = temp.TransactionDate;
                 }
@@ -37,18 +45,18 @@ namespace Bankoki_client_server_.Shared
                 Console.WriteLine(ex.Message);
             }
         }
-        public int signedAmmount()
+        public int signedAmount()
         {
-            return this.Credit ? this.Ammount : -1 * this.Ammount;
+            return this.Credit ? this.Amount : -1 * this.Amount;
         }
         public int sum(int term)
         {
             
-            return this.Credit ? term+this.Ammount : term-this.Ammount;
+            return this.Credit ? term+this.Amount : term-this.Amount;
         }
         public int sum(Transaction transaction)
         {
-            return this.Credit ? transaction.signedAmmount() + this.Ammount : transaction.signedAmmount() - this.Ammount;
+            return this.Credit ? transaction.signedAmount() + this.Amount : transaction.signedAmount() - this.Amount;
         }
 
         

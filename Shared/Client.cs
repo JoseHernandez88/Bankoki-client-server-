@@ -1,5 +1,6 @@
 ﻿using Bankoki_client_server.Shared;
 using Org.BouncyCastle.Utilities.Collections;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Security.Cryptography.X509Certificates;
 using System.Transactions;
@@ -17,11 +18,20 @@ namespace Bankoki_client_server_.Shared
         public string Email { get; set; }
         = string.Empty;
         public bool LoggedOn { get; set; }
-        public  List<Accounts> Accounts { get; set; }
-        public User()
-        {
-            Accounts = new List<Accounts>();
-        }
+        public  List<Accounts> Accounts { get; set; }= new List<Accounts>();
+
+		public class UserException:Exception {
+			public string ex { get; set; } = string.Empty;
+			public UserException(string message)
+
+			: base(message)
+
+			{
+
+				this.ex = message;
+			}
+		}
+		public User() { }
         public User(string email)
         {
 			Email = email;
@@ -74,6 +84,39 @@ namespace Bankoki_client_server_.Shared
 		public bool VerifyAccountOwner(string accountNumber) 
 		{
 			return Accounts.Contains<Accounts>(new Accounts(accountNumber));
+		}
+
+		public bool Transfer(string AccountFromNumber,string AccountTooNumber, int centAmount)
+		{
+			try 
+			{
+				if(this.VerifyAccountOwner(AccountTooNumber) && this.VerifyAccountOwner(AccountFromNumber))
+				{
+					Bankoki_client_server_.Shared.Accounts from = new Bankoki_client_server_.Shared.Accounts(AccountFromNumber);
+					if (from.balance() >= centAmount / 100.0)
+					{
+						Bankoki_client_server_.Shared.Accounts too = new Bankoki_client_server_.Shared.Accounts(AccountTooNumber);
+						string origin = "Transfer from: " + AccountFromNumber;
+						bool credit = true;
+						Transaction transfer = new Transaction(origin,centAmount,credit);
+						too.addTransaction(transfer);
+						origin = "Transfer too: " + AccountTooNumber;
+						credit = false;
+						transfer=new Transaction(origin,centAmount,credit);
+						from.addTransaction(transfer);
+						return true;
+					}
+					return false;
+
+				}
+				throw new UserException("One or more accounts do not match client "); 
+			}
+			catch (Exception ex) 
+			{ 
+				Console.WriteLine(ex);
+				return false;
+			
+			}
 		}
 
 	}
