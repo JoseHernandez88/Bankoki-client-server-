@@ -27,11 +27,11 @@ namespace Bankoki_client_server.Shared
             }
 
         }
-        /*  hostname=bankoki.mysql.database.azure.com
+		/*  hostname=bankoki.mysql.database.azure.com
             username=BankokiAdmin
             password=Algobuenoyfacil01
             ssl-mode=require
-        
+        */
 		private MySqlConnectionStringBuilder conBuild = new MySqlConnectionStringBuilder
 		{
 			Server = "bankoki.mysql.database.azure.com",
@@ -39,18 +39,17 @@ namespace Bankoki_client_server.Shared
 			Database = "bankoki",
 			UserID = "BankokiAdmin",
 			Password = "Algobuenoyfacil01",
-			//SslMode = MySqlSslMode.VerifyCA,
-            //SslCa = "DigiCertGlobalRootCA.crt.pem"
+			SslMode = MySqlSslMode.VerifyCA,
+            SslCa = "DigiCertGlobalRootCA.crt.pem"
 		};
 
 		public MySqlConnectionStringBuilder ConBuild { get => conBuild; set => conBuild = value; }
-        */
-        string ConnectionString = "server=bankoki.mysql.database.azure.com;uid=BankokiAdmin;password=Algobuenoyfacil01;ssl-mode=required;ssl-ca=DigiCertGlobalRootCA.crt.pem";
+
 		public async Task<long?> insertTransactionAsync(Bankoki_client_server_.Shared.Transaction? transaction,string accountNumber)
         {
             try
             {
-            using (var connection = new MySqlConnection( ConnectionString))
+            using (var connection = new MySqlConnection(ConBuild.ConnectionString))
                 {
                     if (transaction != null)
                     {
@@ -101,7 +100,7 @@ namespace Bankoki_client_server.Shared
         public async Task<Bankoki_client_server_.Shared.Transaction?> getTransactionAsync(int transactionID)
         {
             try { 
-            using (var connection = new MySqlConnection( ConnectionString))
+            using (var connection = new MySqlConnection(ConBuild.ConnectionString))
         {
             
             await connection.OpenAsync();
@@ -147,12 +146,12 @@ namespace Bankoki_client_server.Shared
         {
             try
             {
-                using (var connection = new MySqlConnection(ConnectionString))
+                using (var connection = new MySqlConnection(ConBuild.ConnectionString))
                 {
                     try
                     {
-						Console.WriteLine(connection.ConnectionString); Console.WriteLine((string) connection.ConnectionString);
-						connection.Open();
+						//Console.WriteLine(connection.ConnectionString); Console.WriteLine( connection.ConnectionString);
+						await connection.OpenAsync();
 						
 						Accounts account = new();
                         try
@@ -181,7 +180,7 @@ namespace Bankoki_client_server.Shared
 							}
 							using (var command = connection.CreateCommand())
 							{
-								command.CommandText = @"SELECT * FROM  `account_transaction` with `account`=@number;";
+								command.CommandText = @"SELECT `transactions` FROM  `account_transaction` with `account`=@number;";
 								command.Parameters.AddWithValue("@number", AccountsNumber);
 
 
@@ -217,11 +216,11 @@ namespace Bankoki_client_server.Shared
             }
         }
 
-        public async void closeAccount(string accountNumber)
+        public async void CloseAccount(string accountNumber)
         {
             try
             {
-                using (var connection = new MySqlConnection( ConnectionString))
+                using (var connection = new MySqlConnection(ConBuild.ConnectionString))
                 {
                     using (var command = connection.CreateCommand())
                     {
@@ -237,6 +236,114 @@ namespace Bankoki_client_server.Shared
                 Console.WriteLine(ex.ToString());
             }
         }
+
+        public async void InsertUserAsync(User client)
+        {
+			try
+			{
+				using (var connection = new MySqlConnection(ConBuild.ConnectionString))
+				{
+					if (client != null)
+					{
+						await connection.OpenAsync();
+						using (var command = connection.CreateCommand())
+						{
+							await command.ExecuteNonQueryAsync();
+
+
+							command.CommandText = @"INSERT INTO `client` (`email`, `password`, `firstName`, `lastNames`)"+
+                                "VALUES @email, @password, @firstName, @lastName);";
+							command.Parameters.AddWithValue("@email", client.Email);
+							command.Parameters.AddWithValue("@password", client.Password);
+							command.Parameters.AddWithValue("@firstname", client.UserFirstName);
+							command.Parameters.AddWithValue("@lastNames", client.UserLastName);
+							
+						}
+					}
+					else
+					{
+						throw new QueryException("Attempted to insert a Null User.");
+
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+                Console.WriteLine(ex.ToString());
+			}
+		}
+
+		public async Task<User?> GetUserAsync(string email)
+		{
+			try
+			{
+				using (var connection = new MySqlConnection(ConBuild.ConnectionString))
+				{
+					try
+					{
+						//Console.WriteLine(connection.ConnectionString); Console.WriteLine((string)connection.ConnectionString);
+						await connection.OpenAsync();
+
+                        User client = new();
+						try
+						{
+							using (var command = connection.CreateCommand())
+							{
+								command.CommandText = @"SELECT * FROM `client` with `email`=@address;";
+								command.Parameters.AddWithValue("@adress", email);
+
+
+								using (MySqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.CloseConnection))
+								{
+
+									while (await reader.ReadAsync())
+									{
+										client.Email = email;
+										client.UserFirstName = reader.GetString("firstName");
+										client.UserLastName = reader.GetString("lastNames");
+										client.LoggedOn = reader.GetBoolean("loggedIn");										
+									}
+								}
+							}
+							using (var command = connection.CreateCommand())
+							{
+								command.CommandText = @"SELECT `account` FROM `client_account` with `client`=@email;";
+								command.Parameters.AddWithValue("@email", email);
+
+
+								using (MySqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.CloseConnection))
+								{
+
+									while (await reader.ReadAsync())
+									{
+										client.AppendAccount2Accounts(reader.GetString("`client_account`"));
+									}
+								}
+							}
+							return client;
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.ToString());
+							return null;
+						}
+
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine(ex.ToString());
+						return null;
+					}
+
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				return null;
+			}
+
+		}
 
     }
 
