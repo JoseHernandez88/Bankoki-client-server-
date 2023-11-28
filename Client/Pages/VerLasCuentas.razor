@@ -1,0 +1,84 @@
+﻿@page "/Cuenta"
+@inject HttpClient Http
+@using Bankoki_client_server_.Shared;
+
+@if (cuentas.Count <= 0)
+{
+    <span> Ninguna cuenta asociada encontrada...</span>
+}
+else
+{
+
+    @foreach (var cuenta in cuentas)
+    {
+
+        <div style="background-color: #78774890;" class="container rounded-pill mb-4">
+
+            <div class="d-flex justify-content-between">
+
+                <div class="d-flex">
+
+                    <div class="p-2">
+
+                        <img src="Images/CreditcardPlaceholder.png" style="width:200px; height:200px; margin:15px;" class="rounded float-left">
+
+                    </div>
+
+                    <div class="p-2 d-flex align-self-center">
+
+                        <div class="col d-flex flex-column">
+
+
+                            <div class="Tipo-de-Cuenta float-left">
+
+                                <h2>
+                                    @cuenta.AccountType
+                                </h2>
+
+                            </div>
+
+                            <div class="Numero-de-cuenta float-left">
+
+                                <h2>
+                                    @cuenta.AccountNumber
+                                </h2>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="balance-actual ml-auto p-2 d-flex align-self-center justify-content-center">
+
+                    <h3> $@cuenta.Balance </h3>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    }
+
+}
+
+
+@code {
+    List<VerLaCuenta> cuentas = new List<VerLaCuenta>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var results = await Http.GetFromJsonAsync<List<VerLaCuenta>>("api/VerLaCuenta");
+        @if (results != null)
+        {
+            cuentas = results;
+        }
+    }
+
+}
+

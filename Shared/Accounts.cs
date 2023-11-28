@@ -1,5 +1,5 @@
 ﻿using Bankoki_client_server.Shared;
-using Google.Protobuf.WellKnownTypes;
+//using Google.Protobuf.WellKnownTypes;
 using System.Net.Http.Headers;
 using System.Transactions;
 
