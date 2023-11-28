@@ -1,0 +1,18 @@
+﻿@using Bankoki_client_server_.Shared
+@page "/Account"
+
+
+<PageTitle>Account</PageTitle>
+
+@code{
+
+
+	static string accNum = "000000000000000002";
+	Accounts acc = new Accounts(accNum);
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		Console.WriteLine(acc.AccountName);
+	}
+
+}

@@ -8,6 +8,7 @@ using static Bankoki_client_server.Shared.QueryHandler;
 using System.Transactions;
 using System.Data.Common;
 using System.Reflection.PortableExecutable;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Bankoki_client_server.Shared
 {
@@ -26,21 +27,30 @@ namespace Bankoki_client_server.Shared
             }
 
         }
+        /*  hostname=bankoki.mysql.database.azure.com
+            username=BankokiAdmin
+            password=Algobuenoyfacil01
+            ssl-mode=require
+        
+		private MySqlConnectionStringBuilder conBuild = new MySqlConnectionStringBuilder
+		{
+			Server = "bankoki.mysql.database.azure.com",
+            Port=3306,
+			Database = "bankoki",
+			UserID = "BankokiAdmin",
+			Password = "Algobuenoyfacil01",
+			//SslMode = MySqlSslMode.VerifyCA,
+            //SslCa = "DigiCertGlobalRootCA.crt.pem"
+		};
 
-        public MySqlConnectionStringBuilder conBuild= new MySqlConnectionStringBuilder
-        {
-            Server = "bankoki.mysql.database.azure.com",
-            Database = "bankoki",
-            UserID = "BankokiAdmin",
-            Password = "Algobuenoyfacil01",
-            SslMode = MySqlSslMode.Required,
-        };
-
-        public async Task<long?> insertTransactionAsync(Bankoki_client_server_.Shared.Transaction? transaction,string accountNumber)
+		public MySqlConnectionStringBuilder ConBuild { get => conBuild; set => conBuild = value; }
+        */
+        string ConnectionString = "server=bankoki.mysql.database.azure.com;uid=BankokiAdmin;password=Algobuenoyfacil01;ssl-mode=required;ssl-ca=DigiCertGlobalRootCA.crt.pem";
+		public async Task<long?> insertTransactionAsync(Bankoki_client_server_.Shared.Transaction? transaction,string accountNumber)
         {
             try
             {
-            using (var connection = new MySqlConnection(conBuild.ConnectionString))
+            using (var connection = new MySqlConnection( ConnectionString))
                 {
                     if (transaction != null)
                     {
@@ -91,7 +101,7 @@ namespace Bankoki_client_server.Shared
         public async Task<Bankoki_client_server_.Shared.Transaction?> getTransactionAsync(int transactionID)
         {
             try { 
-            using (var connection = new MySqlConnection(conBuild.ConnectionString))
+            using (var connection = new MySqlConnection( ConnectionString))
         {
             
             await connection.OpenAsync();
@@ -137,51 +147,60 @@ namespace Bankoki_client_server.Shared
         {
             try
             {
-                using (var connection = new MySqlConnection(conBuild.ConnectionString))
+                using (var connection = new MySqlConnection(ConnectionString))
                 {
-
-                    await connection.OpenAsync();
                     try
                     {
-                        Accounts account = new();
-                        using (var command = connection.CreateCommand())
+						Console.WriteLine(connection.ConnectionString); Console.WriteLine((string) connection.ConnectionString);
+						connection.Open();
+						
+						Accounts account = new();
+                        try
                         {
-                            command.CommandText = @"SELECT * FROM `account` with accountNumber=@number;";
-                            command.Parameters.AddWithValue("@number", AccountsNumber);
-                            
-                            
-                        using (MySqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.CloseConnection))
-                            {
+							using (var command = connection.CreateCommand())
+							{
+								command.CommandText = @"SELECT * FROM `account` with accountNumber=@number;";
+								command.Parameters.AddWithValue("@number", AccountsNumber);
 
-                                while (await reader.ReadAsync())
-                                {
-                                    account.AccountNumber = AccountsNumber;
-                                    account.OpenDate= DateOnly.FromDateTime(reader.GetDateTime("openDate"));
-                                    account.AccountName = reader.GetString("accountName");
-                                    account.Open = reader.GetBoolean("openStatus");
-                                    if (!account.Open)
-                                    {
-                                        account.CloseDate = DateOnly.FromDateTime(reader.GetDateTime("closeDATE"));
-                                    }
-                                }
-                            }
-                        }
-                        using (var command = connection.CreateCommand())
-                        { 
-                            command.CommandText = @"SELECT * FROM  `account_transaction` with `account`=@number;";
-                            command.Parameters.AddWithValue("@number", AccountsNumber);
-                           
 
-                            using (MySqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.CloseConnection))
-                            {
+								using (MySqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.CloseConnection))
+								{
 
-                                while (await reader.ReadAsync())
-                                {
-                                    account.appendTransaction2History(reader.GetInt32("`transactions`"));
-                                }
-                            }
-                        }
-                        return account;
+									while (await reader.ReadAsync())
+									{
+										account.AccountNumber = AccountsNumber;
+										account.OpenDate = DateOnly.FromDateTime(reader.GetDateTime("openDate"));
+										account.AccountName = reader.GetString("accountName");
+										account.Open = reader.GetBoolean("openStatus");
+										if (!account.Open)
+										{
+											account.CloseDate = DateOnly.FromDateTime(reader.GetDateTime("closeDATE"));
+										}
+									}
+								}
+							}
+							using (var command = connection.CreateCommand())
+							{
+								command.CommandText = @"SELECT * FROM  `account_transaction` with `account`=@number;";
+								command.Parameters.AddWithValue("@number", AccountsNumber);
+
+
+								using (MySqlDataReader reader = await command.ExecuteReaderAsync(CommandBehavior.CloseConnection))
+								{
+
+									while (await reader.ReadAsync())
+									{
+										account.appendTransaction2History(reader.GetInt32("`transactions`"));
+									}
+								}
+							}
+							return account;
+						}catch (Exception ex)
+                        {
+							Console.WriteLine(ex.ToString());
+							return null;
+						}
+                        
                     }
                     catch (Exception ex)
                     {
@@ -202,7 +221,7 @@ namespace Bankoki_client_server.Shared
         {
             try
             {
-                using (var connection = new MySqlConnection(conBuild.ConnectionString))
+                using (var connection = new MySqlConnection( ConnectionString))
                 {
                     using (var command = connection.CreateCommand())
                     {

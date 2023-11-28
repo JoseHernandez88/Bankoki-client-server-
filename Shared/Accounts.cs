@@ -30,20 +30,22 @@ namespace Bankoki_client_server_.Shared
         }
         public Accounts() { }
 
-        public Accounts(string AccountNumber)
+		public Accounts(string AccNumber)
         {
-            this.AccountNumber = AccountNumber;
+            AccountNumber = AccNumber;
             QueryHandler qh = new QueryHandler();
             try
             {
-                Accounts? temp= qh.getAccountsAsync(this.AccountNumber).Result;
-                if (temp != null)
+				Accounts? temp = qh.getAccountsAsync(AccountNumber).Result;
+				//Accounts? temp = qh.getAccountsAsync(AccNumber).Result;
+
+				if (temp != null)
                 {
-                    this.History = temp.History;
-                    this.OpenDate = temp.OpenDate;
-                    this.CloseDate = temp.CloseDate;
-                    this.AccountName = temp.AccountName;
-                    this.Open = temp.Open;
+					History = temp.History;
+                    OpenDate = temp.OpenDate;
+                    CloseDate = temp.CloseDate;
+                    AccountName = temp.AccountName;
+                    Open = temp.Open;
                 }
                 else
                 {
@@ -54,8 +56,6 @@ namespace Bankoki_client_server_.Shared
             {
                 Console.WriteLine(ex.Message);
             }
-
-
         }
         public double balance()
         {
