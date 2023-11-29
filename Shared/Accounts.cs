@@ -76,7 +76,7 @@ namespace Bankoki_client_server_.Shared
                     this.CloseDate = DateOnly.FromDateTime(DateTime.Now);
                     this.Open = false;
                     QueryHandler qh = new QueryHandler();
-                    qh.closeAccount(this.AccountNumber);
+                    qh.CloseAccount(this.AccountNumber);
                 }
                 else
                 {
@@ -108,6 +108,13 @@ namespace Bankoki_client_server_.Shared
         public void appendTransaction2History(int transactionID)
         {
             this.History.Append<Transaction>(new Transaction(transactionID));
+        }
+
+        public void test()
+        {
+            QueryHandler qh = new QueryHandler();
+            //qh.test();
+            Console.WriteLine(qh.ConBuild.ConnectionString);
         }
     }
 }

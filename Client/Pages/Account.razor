@@ -1,4 +1,4 @@
-﻿@using Bankoki_client_server_.Shared
+﻿@using Bankoki_client_server_.Shared;
 @page "/Account"
 
 
@@ -8,12 +8,13 @@
 @code{
 
 
-	static string accNum = "000000000000000002";
-	Accounts acc = new Accounts(accNum);
+	static string accNum = "000000000000000002"; 
 	protected override async Task OnInitializedAsync()
 	{
+		Bankoki_client_server_.Shared.Accounts ac = new(accNum);
 		await base.OnInitializedAsync();
-		Console.WriteLine(acc.AccountName);
+		ac.test();
+		Console.WriteLine();
 	}
 
 }

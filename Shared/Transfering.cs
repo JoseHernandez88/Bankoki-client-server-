@@ -20,6 +20,8 @@ namespace Bankoki_client_server_.Shared
         public required string AccountNumber2 { get; set; }
                 
         public required int Balance2 { get; set; }
+
+
   
 	}
 }

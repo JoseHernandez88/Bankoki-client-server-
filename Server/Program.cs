@@ -1,8 +1,31 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.ResponseCompression;
+using Bankoki_client_server_.Server.Data;
+using Microsoft.Extensions.Configuration;
+using static Org.BouncyCastle.Math.EC.ECCurve;
+
+
+
 
 var builder = WebApplication.CreateBuilder(args);
-
+string? connectionString = builder.Configuration.GetConnectionString("Default Connection");
 // Add services to the container.
+try
+{
+	if (connectionString != null)
+	{
+		builder.Services.AddDbContext<DataContext>(options =>
+		options.UseMySql(ServerVersion.AutoDetect(connectionString)));
+	}
+	else
+	{
+		throw new Exception("Conection string is null.");
+	}
+}catch(Exception ex)
+{
+	Console.WriteLine(ex.ToString());
+}
+
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();

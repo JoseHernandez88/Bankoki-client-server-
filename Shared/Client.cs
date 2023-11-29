@@ -85,7 +85,12 @@ namespace Bankoki_client_server_.Shared
 		{
 			return Accounts.Contains<Accounts>(new Accounts(accountNumber));
 		}
-
+		public void SetLoggedOn()
+		{
+			LoggedOn = true;
+			QueryHandler qh = new QueryHandler();
+			qh.LoggedOn(Email);
+		}
 		public bool Transfer(string AccountFromNumber,string AccountTooNumber, int centAmount)
 		{
 			try 
@@ -109,7 +114,7 @@ namespace Bankoki_client_server_.Shared
 					return false;
 
 				}
-				throw new UserException("One or more accounts do not match client "); 
+				throw new UserException("One or more accounts do not match client."); 
 			}
 			catch (Exception ex) 
 			{ 

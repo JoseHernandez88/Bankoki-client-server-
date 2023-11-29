@@ -99,7 +99,8 @@ namespace Bankoki_client_server_.Shared
 			}
 		}
 	}
-    }
-}
+ }
+
+
 
 
