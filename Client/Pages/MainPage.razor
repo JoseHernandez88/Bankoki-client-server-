@@ -2,9 +2,62 @@
 
 <PageTitle>MainPage</PageTitle>
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+<style>
+    body {
+        background-image: url("../Assets/yunqueBlur.png");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }
+    .text {
+        text-align: center;
+        margin-bottom: 10%;
+    }
+    .parrafo1 {
+        margin-top: 5%;
+        width: 50%;
+        color: #ACAA79;
+        text-align: center;
+    }
+    .instruccion{
+        margin-top: 5%;
+        width: 50%;
+        color: #6e6c48;
+        text-align: center;
+    }
+</style>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
- 
+<div class="container ">
+
+    <h1 class="text-center" style="margin-top:5%">Bienvenidos a Bankokí</h1>
+
+    <div>
+
+        <div class="d-flex justify-content-around">
+            <div class="parrafo1">
+                Aspiramos a ser tu banco de preferencia donde tenesmo tus mejores intereses en mente. Queremos mantener tu dinero seguro y que tengas total tranparencia sobre tus transacciones.
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-around">
+            <div class="instruccion">
+                Si desea ver sus cuentas oprima <span style="font-weight:600">Ver Cuentas</span>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-around">
+            <div class="instruccion">
+                Si desea transferir dinero de una cuenta a otra oprima <span style="font-weight:600">Transferir de cuenta</span>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-around">
+            <div class="instruccion">
+                Si desea ordenar un libro de cajas oprima <span style="font-weight:600">Ordenar libro de cajas</span>
+            </div>
+        </div>
+        
+    </div>
+
+</div>

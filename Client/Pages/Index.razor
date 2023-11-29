@@ -1,5 +1,7 @@
 ﻿@layout LoginLayout
 @inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using Bankoki_client_server.Shared
 @page "/"
 
 
@@ -53,6 +55,7 @@
         font-size: 20px;
         font-family: "Times New Roman", Times, serif;
     }
+
     .textBoxTitle {
         font-family: "Times New Roman", Times, serif;
     }
@@ -110,7 +113,7 @@
 
         <form action="/url" method="GET">
             <div class="textBoxPos">
-                <input @bind="email" type ="text" placeholder="email" class="TextBox" name="Email" />
+                <input @bind="email" type="text" placeholder="email" class="TextBox" name="Email" />
             </div>
 
             <div class="textBoxPos">
@@ -126,19 +129,40 @@
             <NavLink class="registrationButton" href="Registration">
                 Aun no eres un miembro? <span style="color: #949259">Crea una cuenta</span>
             </NavLink>
+            <p>@notice</p>
         </div>
     </div>
 </div>
 
 @code {
-    private string? contrasena { get; set; }
-    private string? email { get; set; }
+    private string contrasena { get; set; }
+    private string email { get; set; }
+    string notice = "";
 
     private void LoginValidation()
     {
-        if (email == "hola@gmail.com" && contrasena == "1234")
+
+        if (email != null && contrasena != null)
         {
-            NavigationManager.NavigateTo("/MainPage");
+            if (email.Contains("@") && email.Contains(".com"))
+            {
+                if (email == "hola@gmail.com" && contrasena == "1234")
+                {
+                    NavigationManager.NavigateTo("/MainPage");
+                }
+                else
+                {
+                    notice = "Contraseña incorrecta";
+                }
+            }
+            else
+            {
+                notice = "Porfavor ingrese email valido";
+            }
+        }
+        else
+        {
+            notice = "Porfavor ingrese email y contraseña";
         }
     }
 }
